@@ -123,3 +123,73 @@ def test_compose_rejects_empty_and_overflow():
         compose([{"fa": "فرش"}] * 9, ["ir"])
     with pytest.raises(ValidationError):
         compose([{"fa": "فرش"}], ["."])
+
+
+@pytest.mark.parametrize("latin", ["hello world", "brand.com", "-brand", "brand-", "a" * 64, "فروشگاه"])
+def test_compose_does_not_silently_change_explicit_spelling(latin):
+    with pytest.raises(ValidationError, match="studio_latin_invalid"):
+        compose([{"fa": "برند", "latin": latin}], ["com"])
+
+
+def test_compose_offers_business_word_pairs_without_personal_names():
+    result = compose(
+        [{"fa": word, "latin": word, "role": "keyword"} for word in ["green", "shop", "home"]],
+        ["com"],
+        ["joined"],
+    )
+    labels = {item["label"] for item in result["labels"]}
+    assert {"greenshop", "shopgreen", "greenhome", "homegreen"} <= labels
+
+
+@pytest.mark.parametrize("fa", [None, 42, [], "ا" * 41])
+def test_compose_rejects_malformed_words(fa):
+    with pytest.raises(ValidationError):
+        compose([{"fa": fa}], ["com"])
+
+
+@pytest.mark.parametrize("path", ["inspect", "compose"])
+@pytest.mark.parametrize("body", [["unexpected"], "unexpected", 42])
+def test_names_endpoints_reject_non_object_payload(client, login, path, body):
+    response = client.post(f"/api/names/{path}", json=body, headers=login)
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize("suffix", ["notarealtld", "example.com", "com.invalidtld"])
+def test_names_api_rejects_unknown_or_non_public_suffix(client, login, suffix):
+    response = client.post(
+        "/api/names/compose",
+        json={"tokens": [{"fa": "نگین"}], "tlds": [suffix]},
+        headers=login,
+    )
+    assert response.status_code == 422
+
+
+def test_names_api_accepts_multi_part_public_suffix(client, login):
+    response = client.post(
+        "/api/names/compose",
+        json={"tokens": [{"fa": "نگین"}], "tlds": ["co.ir"]},
+        headers=login,
+    )
+    assert response.status_code == 200
+    assert response.json["domains"][0]["domain"] == "negin.co.ir"
+
+
+def test_names_can_check_domains_using_authoritative_job_results(client, login, app, monkeypatch):
+    from tests.integration.test_auth_jobs import wait
+
+    async def fake_execute(tool, item, *args, **kwargs):
+        return {**item, "status": "likely_available", "reason_code": "rdap_not_found"}
+
+    monkeypatch.setattr(app.extensions["scheduler"], "execute", fake_execute)
+    composed = client.post(
+        "/api/names/compose", json={"tokens": [{"fa": "نگین"}], "tlds": ["com"]}, headers=login
+    ).json
+    response = client.post(
+        "/api/jobs",
+        json={"tool": "domain_batch", "text": composed["domains"][0]["domain"]},
+        headers=login,
+    )
+    assert response.status_code == 202
+    result = wait(client, response.json["job_id"])
+    assert result["results"][0]["ascii"] == "negin.com"
+    assert result["results"][0]["status"] == "likely_available"

@@ -136,12 +136,17 @@ def _clean_tokens(tokens):
     for token in tokens:
         if not isinstance(token, dict):
             raise ValidationError("invalid_input")
-        persian = normalize_fa(token.get("fa", ""))[:40]
+        raw_persian = token.get("fa", "")
+        if not isinstance(raw_persian, str) or len(raw_persian) > 40:
+            raise ValidationError("invalid_input")
+        persian = normalize_fa(raw_persian)
         supplied = token.get("latin", "")
         if supplied is None:
             supplied = ""
         if not isinstance(supplied, str) or len(supplied) > 80:
             raise ValidationError("invalid_input")
+        if supplied.strip() and not _LABEL.fullmatch(supplied.strip().lower()):
+            raise ValidationError("studio_latin_invalid")
         latin = _label(supplied) or _label(transliterate(persian))
         role = token.get("role")
         if role not in _ROLES:
@@ -186,7 +191,9 @@ def compose(tokens, tlds, styles=None):
         if not isinstance(tld, str):
             raise ValidationError("invalid_input")
         cleaned_tld = _tld(tld)
-        if cleaned_tld and cleaned_tld not in suffixes:
+        if not cleaned_tld:
+            raise ValidationError("studio_invalid_tld")
+        if cleaned_tld not in suffixes:
             suffixes.append(cleaned_tld)
     if not suffixes:
         raise ValidationError("invalid_input")
@@ -215,6 +222,11 @@ def compose(tokens, tlds, styles=None):
             for place in places:
                 _add(sequences, [keyword, place])
                 _add(sequences, [place, keyword])
+    # Two business words should offer useful brands even without a given name or place.
+    for first in keywords:
+        for second in keywords:
+            if first is not second:
+                _add(sequences, [first, second])
     for token in cleaned:
         _add(sequences, [token])
 
@@ -255,4 +267,6 @@ def compose(tokens, tlds, styles=None):
                 break
         if len(domains) >= MAX_DOMAINS:
             break
+    if not domains:
+        raise ValidationError("invalid_domain")
     return {"tokens": cleaned, "labels": labels, "domains": domains}

@@ -306,8 +306,10 @@ def names_search():
 def names_inspect():
     from netnama.core.names import inspect_word
 
-    text = (request.get_json(silent=True) or {}).get("text", "")
-    return jsonify(inspect_word(text))
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        raise ValidationError("invalid_input")
+    return jsonify(inspect_word(data.get("text", "")))
 
 
 @bp.post("/names/compose")
@@ -315,8 +317,20 @@ def names_inspect():
 def names_compose():
     from netnama.core.names import compose
 
-    data = request.get_json(silent=True) or {}
-    return jsonify(compose(data.get("tokens"), data.get("tlds"), data.get("styles")))
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        raise ValidationError("invalid_input")
+    result = compose(data.get("tokens"), data.get("tlds"), data.get("styles"))
+    resources = current_app.extensions["resources"].snapshot()
+    if not resources.psl or not resources.tlds:
+        raise ValidationError("resources_unavailable")
+    from netnama.core.validation import domain
+
+    for item in result["domains"]:
+        normalized = domain(item["domain"], resources)
+        if normalized.ascii != normalized.registrable:
+            raise ValidationError("studio_invalid_tld")
+    return jsonify(result)
 
 
 @bp.post("/domain/normalize")

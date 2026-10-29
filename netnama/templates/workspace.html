@@ -47,13 +47,16 @@
 <div class="terminal-header"><span>{{ icon('terminal') }}<span data-i18n="terminal">{{ t('terminal') }}</span></span><div class="terminal-actions"><button id="copy-terminal" class="icon-button" data-aria="copy" aria-label="{{ t('copy') }}">{{ icon('copy') }}</button><button id="wrap-terminal" class="icon-button" data-aria="wrap" aria-label="{{ t('wrap') }}" aria-pressed="false">{{ icon('wrap-text') }}</button><button id="clear-terminal" class="icon-button" data-aria="clear" aria-label="{{ t('clear') }}" data-title="clear_help" title="{{ t('clear_help') }}">{{ icon('eraser') }}</button></div></div><pre id="terminal" dir="ltr" tabindex="0"></pre><p id="truncation" class="small warning-text" hidden data-i18n="truncated">{{ t('truncated') }}</p></section></div>
 {% elif page == 'domain_names' %}
 <section class="panel name-studio" id="name-studio">
-  <div class="stepper" role="tablist" aria-label="{{ t('domain_names') }}">
+  <div class="studio-intro"><div><span class="eyebrow">NAME STUDIO</span><h2 data-i18n="studio_title">{{ t('studio_title') }}</h2><p class="muted" data-i18n="studio_intro">{{ t('studio_intro') }}</p></div>{{ icon('sparkles') }}</div>
+  <button type="button" id="studio-direct-jump" class="button secondary" data-i18n="studio_direct">{{ t('studio_direct') }}</button>
+  <details class="studio-guide"><summary data-i18n="studio_guide_title">{{ t('studio_guide_title') }}</summary><p data-i18n="studio_guide">{{ t('studio_guide') }}</p></details>
+  <div class="stepper" role="group" aria-label="{{ t('domain_names') }}">
     {% for number, key in [(1,'studio_step_words'),(2,'studio_step_names'),(3,'studio_step_latin'),(4,'studio_step_address')] %}
     <button type="button" class="step" data-step="{{ number }}"><small dir="ltr">{{ number }}</small><span data-i18n="{{ key }}">{{ t(key) }}</span></button>
     {% endfor %}
   </div>
   <div id="token-summary" class="summary-row"></div>
-  <div id="studio-1">
+  <div id="studio-1" tabindex="-1">
     <p class="muted" data-i18n="studio_words_help">{{ t('studio_words_help') }}</p>
     <div class="studio-add"><label><span data-i18n="studio_add_word">{{ t('studio_add_word') }}</span><input id="word-input" maxlength="40" autocomplete="off" placeholder="{{ t('studio_word_placeholder') }}"></label><button type="button" id="word-add" class="button secondary">{{ icon('plus') }}<span data-i18n="studio_add_word">{{ t('studio_add_word') }}</span></button></div>
     <p class="small muted" data-i18n="studio_places">{{ t('studio_places') }}</p>
@@ -61,7 +64,7 @@
     <p class="small" data-i18n="studio_your_words">{{ t('studio_your_words') }}</p>
     <div id="word-list" class="token-stack"></div>
   </div>
-  <div id="studio-2" hidden>
+  <div id="studio-2" tabindex="-1" hidden>
     <p class="muted" data-i18n="studio_names_help">{{ t('studio_names_help') }}</p>
     <label><span data-i18n="studio_name_search">{{ t('studio_name_search') }}</span><input id="name-query" maxlength="40" autocomplete="off" placeholder="{{ t('studio_name_placeholder') }}"></label>
     <div class="button-row" id="gender-filters" role="group" aria-label="{{ t('studio_gender_all') }}">
@@ -81,18 +84,25 @@
     <p class="small" data-i18n="studio_selected_names">{{ t('studio_selected_names') }}</p>
     <div id="name-selected" class="token-stack"></div>
   </div>
-  <div id="studio-3" hidden>
+  <div id="studio-3" tabindex="-1" hidden>
     <p class="muted" data-i18n="studio_latin_help">{{ t('studio_latin_help') }}</p>
     <div id="token-list" class="token-stack"></div>
     <label class="check-label"><input id="style-joined" type="checkbox" checked><span data-i18n="studio_joined">{{ t('studio_joined') }}</span></label>
     <label class="check-label"><input id="style-hyphen" type="checkbox" checked><span data-i18n="studio_hyphen">{{ t('studio_hyphen') }}</span></label>
   </div>
-  <div id="studio-4" hidden>
+  <div id="studio-4" tabindex="-1" hidden>
     <p class="muted" data-i18n="studio_tld_help">{{ t('studio_tld_help') }}</p>
     <div id="tld-list" class="tld-grid"></div>
     <div class="studio-add"><label><span data-i18n="studio_custom_tld">{{ t('studio_custom_tld') }}</span><input id="tld-input" dir="ltr" maxlength="24" autocomplete="off" placeholder="co.ir" spellcheck="false"></label><button type="button" id="tld-add" class="button secondary" data-i18n="studio_add_tld">{{ t('studio_add_tld') }}</button></div>
     <div class="button-row"><button type="button" id="build-domains" class="button primary">{{ icon('sparkles') }}<span data-i18n="studio_build">{{ t('studio_build') }}</span></button><button type="button" id="select-domains" class="button secondary" data-i18n="studio_select_all">{{ t('studio_select_all') }}</button><button type="button" id="copy-domains" class="button secondary">{{ icon('copy') }}<span data-i18n="studio_copy_domains">{{ t('studio_copy_domains') }}</span></button><button type="button" id="use-domains" class="button secondary">{{ icon('globe') }}<span data-i18n="studio_add_checker">{{ t('studio_add_checker') }}</span></button></div>
     <p class="small muted" data-i18n="studio_domain_hint">{{ t('studio_domain_hint') }}</p>
+    <div class="studio-add"><label><span data-i18n="studio_direct">{{ t('studio_direct') }}</span><input id="direct-domain" dir="ltr" maxlength="253" placeholder="mybrand.com" spellcheck="false"></label><button type="button" id="direct-add" class="button secondary" data-i18n="studio_direct_add">{{ t('studio_direct_add') }}</button></div>
+    <div class="check-toolbar"><button type="button" id="check-domains" class="button primary">{{ icon('search') }}<span data-i18n="studio_check">{{ t('studio_check') }}</span></button><button type="button" id="cancel-check" class="button secondary" hidden data-i18n="cancel">{{ t('cancel') }}</button><label class="check-label"><input type="checkbox" id="fresh-check"><span data-i18n="force_fresh">{{ t('force_fresh') }}</span></label></div>
+    <p id="check-progress" class="small" role="status" aria-live="polite"></p><progress id="check-meter" max="1" value="0" hidden></progress>
+    <p class="small muted" data-i18n="availability_notice">{{ t('availability_notice') }}</p>
+    <div class="domain-filters"><label><span data-i18n="studio_filter">{{ t('studio_filter') }}</span><input id="domain-filter" type="search" dir="ltr"></label><label><span data-i18n="studio_status">{{ t('studio_status') }}</span><select id="domain-status">{% for key in ['all','likely_available','registered','unchecked','unresolved'] %}<option value="{{ key }}" data-i18n="studio_filter_{{ key }}">{{ t('studio_filter_' + key) }}</option>{% endfor %}</select></label><label class="check-label"><input type="checkbox" id="favorites-only"><span data-i18n="studio_favorites">{{ t('studio_favorites') }}</span></label><label><span data-i18n="studio_sort">{{ t('studio_sort') }}</span><select id="domain-sort"><option value="original" data-i18n="studio_sort_original">{{ t('studio_sort_original') }}</option><option value="short" data-i18n="studio_sort_short">{{ t('studio_sort_short') }}</option><option value="alpha" data-i18n="studio_sort_alpha">{{ t('studio_sort_alpha') }}</option></select></label></div>
+    <p id="domain-count" class="small muted" aria-live="polite"></p>
+    <p id="domain-no-match" class="muted" hidden data-i18n="studio_no_match">{{ t('studio_no_match') }}</p>
     <div id="domain-list"></div>
     <p id="domain-empty" class="muted" data-i18n="studio_empty_domains">{{ t('studio_empty_domains') }}</p>
   </div>
