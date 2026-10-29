@@ -39,3 +39,12 @@ Explicit verification boundaries (not falsely checked as executed):
 
 No credentials, runtime input/results, uploaded TXT or export artifacts are committed.
 No network failure is converted into availability or success.
+
+## Interface controls update
+
+- [x] Icon-only theme button cycles system → light → dark and preserves preference.
+- [x] Icon-triggered language dropdown has checked selection, arrow navigation and Escape.
+- [x] Bilingual native logout dialog requires confirmation and preserves CSRF protection.
+- [x] Cancel/Escape restores focus; modal traps Tab and works inside the mobile drawer.
+- [x] Browser flow verified theme/system persistence, RTL/LTR, no premature logout requests,
+  actual confirmed logout, mobile layout and no JavaScript errors; all 64 backend tests pass.

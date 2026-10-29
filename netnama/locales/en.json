@@ -194,5 +194,10 @@
   "export_format": "Export format",
   "domain_helpers": "IDN converter & domain structure",
   "normalize": "Normalize & inspect",
-  "suffix_list": "Add suffix from IANA list"
+  "suffix_list": "Add suffix from IANA list",
+  "next_theme": "Next mode",
+  "logout_title": "Sign out of NetNama?",
+  "logout_description": "You will need to sign in again to use the tools.",
+  "stay_signed_in": "Stay signed in",
+  "confirm_logout": "Yes, sign out"
 }

@@ -16,17 +16,86 @@ function translate() {
   for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
   for (const el of document.querySelectorAll('[data-aria]')) el.setAttribute('aria-label', t(el.dataset.aria));
   for (const el of document.querySelectorAll('[data-title]')) el.title = t(el.dataset.title);
-  $('locale-label').textContent = locale === 'fa' ? 'EN' : 'فا';
+  updatePreferences();
   document.title = `${t('brand')} · ${t(page)}`;
   if(current) renderJob();
   if(capabilities) renderCapabilities();
   if(resourceData) renderResources();
 }
-$('locale-toggle')?.addEventListener('click', () => {locale = locale === 'fa' ? 'en' : 'fa'; safeSet('locale', locale); translate();});
-const themeSelect = $('theme-select'); themeSelect.value = safeGet('theme', 'system');
-function applyTheme() {const pref = themeSelect.value; document.documentElement.dataset.theme = pref === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : pref;}
-themeSelect.addEventListener('change', () => {safeSet('theme', themeSelect.value); applyTheme();});
+const themeModes = ['system', 'light', 'dark'];
+let themeMode = safeGet('theme', 'system');
+if (!themeModes.includes(themeMode)) themeMode = 'system';
+function updatePreferences() {
+  const next = themeModes[(themeModes.indexOf(themeMode) + 1) % themeModes.length];
+  const label = `${t('theme')}: ${t(themeMode)} · ${t('next_theme')}: ${t(next)}`;
+  $('theme-toggle').setAttribute('aria-label', label);
+  $('theme-toggle').title = label;
+  $('theme-toggle').dataset.themeMode = themeMode;
+  const icon = document.createElement('i');
+  icon.dataset.icon = {system:'monitor', light:'sun', dark:'moon'}[themeMode];
+  icon.setAttribute('aria-hidden', 'true');
+  $('theme-icon').replaceChildren(icon);
+  const languageLabel = `${t('language')}: ${languageOptions.find(button => button.dataset.locale === locale)?.querySelector('span').textContent || locale}`;
+  $('locale-toggle').setAttribute('aria-label', languageLabel);
+  $('locale-toggle').title = languageLabel;
+  for (const button of document.querySelectorAll('[data-locale]')) button.setAttribute('aria-checked', String(button.dataset.locale === locale));
+  renderIcons();
+}
+function applyTheme() {
+  document.documentElement.dataset.theme = themeMode === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : themeMode;
+  updatePreferences();
+}
+$('theme-toggle').addEventListener('click', () => {
+  themeMode = themeModes[(themeModes.indexOf(themeMode) + 1) % themeModes.length];
+  safeSet('theme', themeMode); applyTheme();
+});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+const languageMenu = $('locale-menu');
+const languageOptions = [...languageMenu.querySelectorAll('[data-locale]')];
+function closeLanguageMenu(restoreFocus=false) {
+  languageMenu.hidden = true;
+  $('locale-toggle').setAttribute('aria-expanded', 'false');
+  if (restoreFocus) $('locale-toggle').focus();
+}
+function openLanguageMenu(index=languageOptions.findIndex(button => button.dataset.locale === locale)) {
+  languageMenu.hidden = false;
+  $('locale-toggle').setAttribute('aria-expanded', 'true');
+  languageOptions[index].focus();
+}
+$('locale-toggle').addEventListener('click', () => languageMenu.hidden ? openLanguageMenu() : closeLanguageMenu(true));
+$('locale-toggle').addEventListener('keydown', event => {
+  if (['ArrowDown','ArrowUp'].includes(event.key)) {event.preventDefault();openLanguageMenu(event.key === 'ArrowDown' ? 0 : languageOptions.length - 1);}
+});
+for (const button of languageOptions) button.addEventListener('click', () => {
+  locale = button.dataset.locale; safeSet('locale', locale); closeLanguageMenu(true); translate();
+});
+languageMenu.addEventListener('keydown', event => {
+  const index = languageOptions.indexOf(document.activeElement);
+  if (event.key === 'Escape') {event.preventDefault();event.stopPropagation();closeLanguageMenu(true);}
+  else if (event.key === 'Tab') closeLanguageMenu(true);
+  else if (['ArrowDown','ArrowUp','Home','End'].includes(event.key)) {
+    event.preventDefault();
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? languageOptions.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + languageOptions.length) % languageOptions.length;
+    languageOptions[next].focus();
+  }
+});
+document.addEventListener('pointerdown', event => {if (!event.target.closest('.locale-picker')) closeLanguageMenu();});
+const logoutDialog = $('logout-dialog');
+$('logout-button')?.addEventListener('click', () => {closeLanguageMenu();logoutDialog.showModal();});
+$('logout-cancel')?.addEventListener('click', () => logoutDialog.close());
+logoutDialog?.addEventListener('keydown', event => {
+  if (event.key !== 'Tab') return;
+  const buttons = [...logoutDialog.querySelectorAll('button:not([disabled])')];
+  const first = buttons[0], last = buttons.at(-1);
+  if (event.shiftKey && document.activeElement === first) {event.preventDefault();last.focus();}
+  else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first.focus();}
+});
+logoutDialog?.addEventListener('click', event => {
+  if (event.target !== logoutDialog) return;
+  const bounds = logoutDialog.getBoundingClientRect();
+  if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) logoutDialog.close();
+});
+$('logout-form')?.addEventListener('submit', () => {$('logout-confirm').disabled = true;});
 async function api(url, data) {
   const response = await fetch(url, {method:data === undefined ? 'GET' : 'POST', headers:{'X-CSRFToken':document.querySelector('meta[name=csrf-token]').content, 'X-NetNama-Locale':locale, ...(data instanceof FormData ? {} : {'Content-Type':'application/json'})}, body:data === undefined ? undefined : data instanceof FormData ? data : JSON.stringify(data)});
   let result;
@@ -43,7 +112,7 @@ function drawer(open) {
 }
 $('drawer-open')?.addEventListener('click', () => drawer(true)); $('drawer-close')?.addEventListener('click', () => drawer(false)); $('drawer-backdrop')?.addEventListener('click', () => drawer(false));
 document.addEventListener('keydown', e => {
-  if(!$('sidebar')?.classList.contains('open')) return;
+  if(logoutDialog?.open || !$('sidebar')?.classList.contains('open')) return;
   if(e.key === 'Escape') drawer(false);
   if(e.key === 'Tab') {const nodes = [...$('sidebar').querySelectorAll('a,button')].filter(el => el.getClientRects().length); const first=nodes[0], last=nodes.at(-1); if(e.shiftKey && document.activeElement===first) {e.preventDefault();last.focus();} else if(!e.shiftKey && document.activeElement===last) {e.preventDefault();first.focus();}}
 });

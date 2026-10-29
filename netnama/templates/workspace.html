@@ -11,7 +11,7 @@
     <p class="nav-label" data-i18n="system">{{ t('system') }}</p>
     {% for key,glyph in [('resources','sliders-horizontal'),('about','info')] %}<a href="/tools/{{ key }}" class="nav-item {{ 'active' if page == key }}">{{ icon(glyph) }}<span data-i18n="{{ key }}">{{ t(key) }}</span></a>{% endfor %}
   </nav>
-  <div class="sidebar-bottom"><div class="server-note">{{ icon('server') }}<span data-i18n="server_origin">{{ t('server_origin') }}</span></div><p class="small muted" data-i18n="privacy">{{ t('privacy') }}</p><div class="user-row"><span class="avatar">A</span><span>Administrator<small>NetNama · v0.1.0</small></span><form action="/auth/logout" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="icon-button" data-aria="logout" aria-label="{{ t('logout') }}">{{ icon('log-out') }}</button></form></div></div>
+  <div class="sidebar-bottom"><div class="server-note">{{ icon('server') }}<span data-i18n="server_origin">{{ t('server_origin') }}</span></div><p class="small muted" data-i18n="privacy">{{ t('privacy') }}</p><div class="user-row"><span class="avatar">A</span><span>Administrator<small>NetNama · v0.1.0</small></span><button type="button" id="logout-button" class="icon-button" data-aria="logout" data-title="logout" title="{{ t('logout') }}" aria-label="{{ t('logout') }}" aria-haspopup="dialog" aria-controls="logout-dialog">{{ icon('log-out') }}</button></div></div>
 </aside><div id="drawer-backdrop" hidden></div>
 <div class="main-shell"><header class="topbar"><div class="breadcrumb"><button id="drawer-open" class="icon-button" data-aria="menu" aria-label="{{ t('menu') }}" aria-expanded="false" aria-controls="sidebar">{{ icon('menu') }}</button><span data-i18n="workspace">{{ t('workspace') }}</span>{{ icon('chevron-left') }}<strong data-i18n="{{ page }}">{{ t(page) }}</strong></div>{{ controls() }}</header>
 <main class="workspace"><div class="page-heading"><div><span class="eyebrow">NETNAMA / {{ page|upper|replace('_',' ') }}</span><h1 data-i18n="{{ page }}">{{ t(page) }}</h1><p class="muted" data-i18n="{{ page }}_desc">{{ t(page + '_desc') }}</p></div><span class="badge neutral"><span class="status-dot"></span><span id="mode-label" data-i18n="local">{{ t('local') }}</span></span></div>
@@ -52,4 +52,13 @@
 {% endif %}
 <footer><span data-i18n="privacy">{{ t('privacy') }}</span><b>NetNama <span>v0.1.0</span></b></footer>
 </main></div></div>
+<dialog id="logout-dialog" class="confirm-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
+  <div class="dialog-icon">{{ icon('log-out') }}</div>
+  <h2 id="logout-title" data-i18n="logout_title">{{ t('logout_title') }}</h2>
+  <p id="logout-description" class="muted" data-i18n="logout_description">{{ t('logout_description') }}</p>
+  <form id="logout-form" action="/auth/logout" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="dialog-actions"><button type="button" id="logout-cancel" class="button secondary" autofocus data-i18n="stay_signed_in">{{ t('stay_signed_in') }}</button><button type="submit" id="logout-confirm" class="button danger" data-i18n="confirm_logout">{{ t('confirm_logout') }}</button></div>
+  </form>
+</dialog>
 {% endblock %}

@@ -194,5 +194,10 @@
   "export_format": "قالب گزارش",
   "domain_helpers": "تبدیل IDN و ساختار دامنه",
   "normalize": "تبدیل و بررسی ساختار",
-  "suffix_list": "افزودن پسوند از فهرست IANA"
+  "suffix_list": "افزودن پسوند از فهرست IANA",
+  "next_theme": "حالت بعدی",
+  "logout_title": "از حساب خارج می‌شوید؟",
+  "logout_description": "برای استفادهٔ دوباره از ابزارها باید وارد حساب شوید.",
+  "stay_signed_in": "ماندن در حساب",
+  "confirm_logout": "بله، خارج می‌شوم"
 }

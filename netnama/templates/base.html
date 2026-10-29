@@ -14,8 +14,14 @@
 {% macro icon(name) %}<i data-icon="{{ name }}" aria-hidden="true"></i>{% endmacro %}
 {% macro controls() %}
 <div class="preferences">
-  <button type="button" id="locale-toggle" aria-label="{{ t('language') }}" data-aria="language">{{ icon('languages') }}<span id="locale-label">EN</span></button>
-  <label class="theme-label"><span class="sr-only" data-i18n="theme">{{ t('theme') }}</span><select id="theme-select" aria-label="{{ t('theme') }}" data-aria="theme"><option value="system" data-i18n="system">{{ t('system') }}</option><option value="dark" data-i18n="dark">{{ t('dark') }}</option><option value="light" data-i18n="light">{{ t('light') }}</option></select></label>
+  <div class="locale-picker">
+    <button type="button" id="locale-toggle" class="icon-button preference-button" aria-label="{{ t('language') }}" aria-haspopup="menu" aria-expanded="false" aria-controls="locale-menu">{{ icon('languages') }}</button>
+    <div id="locale-menu" class="locale-menu" role="menu" aria-label="{{ t('language') }}" data-aria="language" hidden>
+      <button type="button" role="menuitemradio" data-locale="fa" aria-checked="{{ 'true' if locale == 'fa' else 'false' }}" tabindex="-1"><span lang="fa" dir="rtl">فارسی</span>{{ icon('check') }}</button>
+      <button type="button" role="menuitemradio" data-locale="en" aria-checked="{{ 'true' if locale == 'en' else 'false' }}" tabindex="-1"><span lang="en" dir="ltr">English</span>{{ icon('check') }}</button>
+    </div>
+  </div>
+  <button type="button" id="theme-toggle" class="icon-button preference-button" aria-label="{{ t('theme') }}" data-theme-mode="system"><span id="theme-icon">{{ icon('monitor') }}</span></button>
 </div>
 {% endmacro %}
 {% block body %}{% endblock %}
