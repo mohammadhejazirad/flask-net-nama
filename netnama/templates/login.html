@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="login-shell">
+  <header class="login-top"><a class="brand" href="/"><img src="/static/logo.svg" alt="" width="40" height="40"><span data-i18n="brand">{{ t('brand') }}</span></a>{{ controls() }}</header>
+  <main class="login-main">
+    <div class="login-art" aria-hidden="true"><img src="/static/logo.svg" width="100" height="100" alt=""><span class="eyebrow">DOMAIN & NETWORK TOOLBOX</span><h1 data-i18n="tagline">{{ t('tagline') }}</h1><div class="network-line"></div><span class="server-tag">{{ icon('shield-check') }}<span data-i18n="privacy">{{ t('privacy') }}</span></span></div>
+    <section class="panel login-panel"><div class="tool-icon">{{ icon('lock-keyhole') }}</div><h2 data-i18n="login_title">{{ t('login_title') }}</h2><p class="muted" data-i18n="login_intro">{{ t('login_intro') }}</p>
+      {% if error %}<p class="alert error" role="alert" data-i18n="{{ error }}">{{ t(error) }}</p>{% endif %}
+      <form method="post" action="/auth/login" id="login-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label><span data-i18n="username">{{ t('username') }}</span><input name="username" autocomplete="username" dir="ltr" required maxlength="100"></label>
+        <label><span data-i18n="password">{{ t('password') }}</span><input name="password" type="password" autocomplete="current-password" dir="ltr" required maxlength="256"></label>
+        <button class="button primary" type="submit">{{ icon('log-in') }}<span data-i18n="login">{{ t('login') }}</span></button>
+      </form><p class="small muted" data-i18n="execution_origin">{{ t('execution_origin') }}</p>
+    </section>
+  </main><footer>NetNama v0.1.0 <span>·</span> Open source / MIT</footer>
+</div>
+{% endblock %}

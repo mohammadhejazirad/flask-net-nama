@@ -1,0 +1,22 @@
+services:
+  netnama:
+    build: .
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      NETNAMA_MODE: public
+      NETNAMA_HOST: 0.0.0.0
+      NETNAMA_PASSWORD: ${NETNAMA_PASSWORD:?Set a unique non-default password for first bootstrap}
+      NETNAMA_SECRET_KEY: ${NETNAMA_SECRET_KEY:?Set a random secret with 32 or more characters}
+      NETNAMA_HTTPS: ${NETNAMA_HTTPS:-false}
+    volumes:
+      - netnama-data:/data
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    restart: unless-stopped
+volumes:
+  netnama-data:

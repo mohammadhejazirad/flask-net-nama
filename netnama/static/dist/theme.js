@@ -1,0 +1,1 @@
+try{const e=localStorage.getItem("theme")||"system";document.documentElement.dataset.theme=e==="system"?matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":e;const t=localStorage.getItem("locale")||"fa";document.documentElement.lang=t,document.documentElement.dir=t==="fa"?"rtl":"ltr"}catch{}

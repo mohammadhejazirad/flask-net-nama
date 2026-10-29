@@ -1,0 +1,37 @@
+{
+  "dns": {
+    "source": "https://data.iana.org/rdap/dns.json",
+    "retrieved_at": "2026-10-29T06:49:33.284301+00:00",
+    "publication": "Wed, 28 Oct 2026 22:00:04 GMT",
+    "status": "bundled",
+    "sha256": "2789f2f92f7ba785e0d3cd4cdcc70709e0ded1d331619e6784317c8bf2bc72b6"
+  },
+  "ipv4": {
+    "source": "https://data.iana.org/rdap/ipv4.json",
+    "retrieved_at": "2026-10-29T06:49:33.912962+00:00",
+    "publication": "Fri, 07 Jun 2019 19:00:02 GMT",
+    "status": "bundled",
+    "sha256": "f6ad30d1ebbd16fed6121e1eb54ae7db86edbf5e425345a040aa7893b0447d78"
+  },
+  "ipv6": {
+    "source": "https://data.iana.org/rdap/ipv6.json",
+    "retrieved_at": "2026-10-29T06:49:34.583695+00:00",
+    "publication": "Fri, 01 Nov 2024 22:00:01 GMT",
+    "status": "bundled",
+    "sha256": "3292eb71787b903f7a6798ff31f7f2239fb61ce346be142a3719ffa26deaf080"
+  },
+  "tlds": {
+    "source": "https://data.iana.org/TLD/tlds-alpha-by-domain.txt",
+    "retrieved_at": "2026-10-29T06:49:35.696675+00:00",
+    "publication": "Wed, 28 Oct 2026 07:07:01 GMT",
+    "status": "bundled",
+    "sha256": "2bb3dd32aaf48fac37f0ffa0ee586af1fbbfde2f02b79910681dc200434dcd58"
+  },
+  "psl": {
+    "source": "https://publicsuffix.org/list/public_suffix_list.dat",
+    "retrieved_at": "2026-10-29T06:49:36.771937+00:00",
+    "publication": "Wed, 28 Oct 2026 13:16:06 GMT",
+    "status": "bundled",
+    "sha256": "1f96bae40adfc22ca2474d7c0099bbcfcb25aefd3e2547b5c2147c0dd2e3ebd9"
+  }
+}

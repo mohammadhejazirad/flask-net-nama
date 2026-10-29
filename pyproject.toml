@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools==84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netnama"
+version = "0.1.0"
+description = "Bilingual, privacy-conscious domain and network toolbox"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "docs/licenses/*"]
+dependencies = ["Flask>=3.1,<4", "Flask-WTF>=1.2,<2", "httpx>=0.28,<1", "dnspython>=2.7,<3", "idna>=3.10,<4", "publicsuffix2==2.20191221", "platformdirs>=4.3,<5", "filelock>=4.2.1,<5", "waitress>=3,<4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.12,<1", "pip-audit>=2.9,<3"]
+
+[project.scripts]
+netnama = "netnama.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["netnama*"]
+
+[tool.setuptools.package-data]
+netnama = ["templates/*.html", "static/**/*", "static/*.svg", "locales/*.json", "resources/bundled/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

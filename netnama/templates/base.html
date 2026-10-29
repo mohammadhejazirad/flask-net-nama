@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="{{ locale }}" dir="{{ dir }}" data-theme="dark">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}"><meta name="color-scheme" content="dark light">
+  <title>{{ t('brand') }} · {{ t(page|default('login')) }}</title>
+  <link rel="icon" href="{{ url_for('static', filename='logo.svg') }}" type="image/svg+xml">
+  <script src="{{ url_for('static', filename='dist/theme.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dist/app.css') }}">
+  <script id="catalogs" type="application/json">{{ catalogs|tojson }}</script>
+  <script defer src="{{ url_for('static', filename='dist/app.js') }}"></script>
+</head>
+<body data-page="{{ page|default('login') }}">
+{% macro icon(name) %}<i data-icon="{{ name }}" aria-hidden="true"></i>{% endmacro %}
+{% macro controls() %}
+<div class="preferences">
+  <button type="button" id="locale-toggle" aria-label="{{ t('language') }}" data-aria="language">{{ icon('languages') }}<span id="locale-label">EN</span></button>
+  <label class="theme-label"><span class="sr-only" data-i18n="theme">{{ t('theme') }}</span><select id="theme-select" aria-label="{{ t('theme') }}" data-aria="theme"><option value="system" data-i18n="system">{{ t('system') }}</option><option value="dark" data-i18n="dark">{{ t('dark') }}</option><option value="light" data-i18n="light">{{ t('light') }}</option></select></label>
+</div>
+{% endmacro %}
+{% block body %}{% endblock %}
+<div id="toast" role="status" aria-live="polite" hidden></div>
+</body></html>
