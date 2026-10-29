@@ -99,10 +99,12 @@ class ResourceManager:
         self.lock = threading.RLock()
         self.update_lock = threading.Lock()
         self.manifest_path = self.directory / "manifest.json"
-        self.manifest = json.loads(self.manifest_path.read_text()) if self.manifest_path.exists() else {}
+        self.manifest = (
+            json.loads(self.manifest_path.read_text(encoding="utf-8")) if self.manifest_path.exists() else {}
+        )
         self.data = {}
         bundled_manifest = (
-            json.loads((BUNDLED / "manifest.json").read_text())
+            json.loads((BUNDLED / "manifest.json").read_text(encoding="utf-8"))
             if (BUNDLED / "manifest.json").exists()
             else {}
         )

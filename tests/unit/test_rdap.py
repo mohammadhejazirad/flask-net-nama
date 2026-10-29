@@ -55,8 +55,8 @@ def test_bootstrap(app):
 def test_ir_recorded_fixtures():
     from pathlib import Path
 
-    registered = Path("tests/fixtures/ir_registered.txt").read_text()
-    missing = Path("tests/fixtures/ir_no_match.txt").read_text()
+    registered = Path("tests/fixtures/ir_registered.txt").read_text(encoding="utf-8")
+    missing = Path("tests/fixtures/ir_no_match.txt").read_text(encoding="utf-8")
     assert classify_ir(registered, "nic.ir")["status"] == "registered"
     target = "netnama-unregistered-check-20261029-8b17f2.ir"
     assert classify_ir(missing, target)["status"] == "likely_available"

@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: uv sync --locked --extra dev
-      - run: uv run pytest -q
+      - run: uv run python -X warn_default_encoding -W error::EncodingWarning -m pytest -q
       - run: uv run ruff check netnama tests
       - run: uv run ruff format --check netnama tests
   frontend:

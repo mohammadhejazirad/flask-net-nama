@@ -21,7 +21,7 @@ def test_public_guard(tmp_path, monkeypatch):
         Settings(tmp_path)
     monkeypatch.setenv("NETNAMA_PASSWORD", "real-new-password-123")
     settings = Settings(tmp_path)
-    assert "real-new-password-123" not in settings.path.read_text()
+    assert "real-new-password-123" not in settings.path.read_text(encoding="utf-8")
     monkeypatch.setenv("NETNAMA_ALLOW_PRIVATE_TARGETS", "true")
     with pytest.raises(ValueError):
         Settings(tmp_path)
@@ -83,8 +83,8 @@ def test_mixed_addresses_blocked(monkeypatch):
 
 def test_catalog_parity():
     root = Path("netnama/locales")
-    en = json.loads((root / "en.json").read_text())
-    fa = json.loads((root / "fa.json").read_text())
+    en = json.loads((root / "en.json").read_text(encoding="utf-8"))
+    fa = json.loads((root / "fa.json").read_text(encoding="utf-8"))
     assert en.keys() == fa.keys()
     assert all(en.values()) and all(fa.values())
 
