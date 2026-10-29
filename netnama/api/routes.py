@@ -286,6 +286,32 @@ def update_resources():
     return jsonify(result), 502 if result.get("status") == "error" else 200
 
 
+@bp.get("/names")
+@authenticated
+def names_search():
+    from netnama.core.names import search
+
+    return jsonify(search(request.args.get("q", ""), request.args.get("gender", ""), request.args.get("limit", 24)))
+
+
+@bp.post("/names/inspect")
+@authenticated
+def names_inspect():
+    from netnama.core.names import inspect_word
+
+    text = (request.get_json(silent=True) or {}).get("text", "")
+    return jsonify(inspect_word(text))
+
+
+@bp.post("/names/compose")
+@authenticated
+def names_compose():
+    from netnama.core.names import compose
+
+    data = request.get_json(silent=True) or {}
+    return jsonify(compose(data.get("tokens"), data.get("tlds"), data.get("styles")))
+
+
 @bp.post("/domain/normalize")
 @authenticated
 def normalize_domain():

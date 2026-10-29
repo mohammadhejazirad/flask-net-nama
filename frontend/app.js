@@ -1,4 +1,5 @@
 import { renderIcons } from './icons.js';
+import { mountNameStudio } from './name-studio.js';
 import { Terminal } from './terminal.js';
 const $ = (id) => document.getElementById(id);
 const catalogs = JSON.parse($('catalogs').textContent);
@@ -6,6 +7,7 @@ let locale = document.documentElement.lang;
 const t = key => catalogs[locale][key] || key;
 const page = document.body.dataset.page;
 let current = null, source = null, poll = null, capabilities = null, resourceData = null;
+let refreshStudio = () => {};
 let lastEvent = 0;
 let toastTimer;
 const safeGet = (key, fallback) => {try {return localStorage.getItem(key) || fallback;} catch {return fallback;}};
@@ -21,6 +23,7 @@ function translate() {
   if(current) renderJob();
   if(capabilities) renderCapabilities();
   if(resourceData) renderResources();
+  refreshStudio();
 }
 const themeModes = ['system', 'light', 'dark'];
 let themeMode = safeGet('theme', 'system');
@@ -243,6 +246,13 @@ async function init() {
 }
 init();
 
+refreshStudio = mountNameStudio({t: key => t(key), api, toast});
+const importedDomains = sessionStorage.getItem('netnama-domain-import');
+if (importedDomains && $('domain-input')) {
+  sessionStorage.removeItem('netnama-domain-import');
+  $('domain-input').value = [$('domain-input').value, importedDomains].filter(Boolean).join('\n');
+  toast(t('studio_imported'));
+}
 $('normalize-button')?.addEventListener('click', async()=>{try {const result=await api('/api/domain/normalize',{target:$('normalize-input').value});$('normalize-output').textContent=JSON.stringify(result,null,2);$('normalize-output').hidden=false;}catch(error){toast(error.message);}});
 if($('suffix-list')) api('/api/suffixes').then(list=>{for(const suffix of list){const option=document.createElement('option');option.value=suffix.toLowerCase();option.textContent=option.value;$('suffix-list').append(option);}}).catch(error=>toast(error.message));
 $('suffix-list')?.addEventListener('change',()=>{if($('suffix-list').value)$('suffixes').value=[$('suffixes').value,$('suffix-list').value].filter(Boolean).join(', ');});

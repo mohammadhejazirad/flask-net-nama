@@ -5,7 +5,7 @@
   <a class="brand" href="/"><img src="/static/logo.svg" alt="" width="42" height="42"><div class="brand-wordmark"><span class="brand-version" dir="ltr">v{{ app_version }}</span><strong data-i18n="brand">{{ t('brand') }}</strong><small>DOMAIN & NETWORK</small></div></a>
   <button class="drawer-close icon-button" id="drawer-close" data-aria="close" aria-label="{{ t('close') }}">{{ icon('x') }}</button>
   <nav><p class="nav-label" data-i18n="workspace">{{ t('workspace') }}</p>
-    {% for key, glyph in [('overview','layout-dashboard'),('domain_batch','globe'),('dns','network'),('ping','activity'),('ip','scan-line'),('http','shield-check')] %}
+    {% for key, glyph in [('overview','layout-dashboard'),('domain_batch','globe'),('domain_names','sparkles'),('dns','network'),('ping','activity'),('ip','scan-line'),('http','shield-check')] %}
     <a href="{{ '/' if key == 'overview' else '/tools/' + key }}" class="nav-item {{ 'active' if page == key }}" {% if page == key %}aria-current="page"{% endif %}>{{ icon(glyph) }}<span data-i18n="{{ key }}">{{ t(key) }}</span>{% if page == key %}<span class="nav-dot"></span>{% endif %}</a>
     {% endfor %}
     <p class="nav-label" data-i18n="system">{{ t('system') }}</p>
@@ -19,7 +19,7 @@
 {% if page == 'overview' %}
 <section class="overview-banner"><div><span class="eyebrow">CLARITY, ONE QUERY AT A TIME.</span><h2 data-i18n="tagline">{{ t('tagline') }}</h2><p data-i18n="execution_origin">{{ t('execution_origin') }}</p><a class="button primary" href="/tools/domain_batch">{{ icon('globe') }}<span data-i18n="domain_batch">{{ t('domain_batch') }}</span></a></div><div class="banner-mark" aria-hidden="true"><img src="/static/logo.svg" alt="" width="126" height="126"></div></section>
 <section id="overview-job" hidden><div class="panel-heading"><h2 data-i18n="current_job">{{ t('current_job') }}</h2><a id="overview-job-link" class="button secondary" data-i18n="open_tool">{{ t('open_tool') }}</a></div><div class="stats-grid">{% for key in ['total','completed_count','registered_count','attention'] %}<div class="panel stat-card"><div><span class="muted small" data-i18n="{{ key }}">{{ t(key) }}</span><strong id="stat-{{ key }}">—</strong></div></div>{% endfor %}</div></section>
-<section class="tool-grid">{% for key,glyph in [('domain_batch','globe'),('dns','network'),('ping','activity'),('ip','scan-line'),('http','shield-check'),('resources','sliders-horizontal')] %}<a class="panel tool-card" href="/tools/{{ key }}"><div class="tool-icon">{{ icon(glyph) }}</div><h2 data-i18n="{{ key }}">{{ t(key) }}</h2><p class="muted" data-i18n="{{ key }}_desc">{{ t(key + '_desc') }}</p><span class="card-link"><span data-i18n="open_tool">{{ t('open_tool') }}</span>{{ icon('arrow-up-left') }}</span></a>{% endfor %}</section>
+<section class="tool-grid">{% for key,glyph in [('domain_names','sparkles'),('domain_batch','globe'),('dns','network'),('ping','activity'),('ip','scan-line'),('http','shield-check'),('resources','sliders-horizontal')] %}<a class="panel tool-card" href="/tools/{{ key }}"><div class="tool-icon">{{ icon(glyph) }}</div><h2 data-i18n="{{ key }}">{{ t(key) }}</h2><p class="muted" data-i18n="{{ key }}_desc">{{ t(key + '_desc') }}</p><span class="card-link"><span data-i18n="open_tool">{{ t('open_tool') }}</span>{{ icon('arrow-up-left') }}</span></a>{% endfor %}</section>
 <section class="panel"><div class="panel-heading"><h2 data-i18n="server_health">{{ t('server_health') }}</h2>{{ icon('server') }}</div><div id="capabilities" class="capabilities"><span data-i18n="loading">{{ t('loading') }}</span></div></section>
 {% elif page in ['domain_batch','dns','ping','ip','http'] %}
 <div class="stats-grid">{% for key,glyph in [('total','layers'),('completed_count','circle-check'),('registered_count','globe'),('attention','circle-alert')] %}<div class="panel stat-card"><span class="stat-icon">{{ icon(glyph) }}</span><div><span class="muted small" data-i18n="{{ key }}">{{ t(key) }}</span><strong id="stat-{{ key }}">—</strong></div></div>{% endfor %}</div>
@@ -28,6 +28,7 @@
 {% if page == 'domain_batch' %}
 <label><span class="sr-only" data-i18n="domains">{{ t('domains') }}</span><textarea id="domain-input" name="text" dir="ltr" rows="8" placeholder="example.com&#10;example.ir&#10;مثال.com" maxlength="1048576"></textarea></label><p class="small muted" data-i18n="paste_help">{{ t('paste_help') }}</p>
 <label class="file-picker">{{ icon('upload') }}<span data-i18n="file">{{ t('file') }}</span><input type="file" id="txt-file" accept=".txt,text/plain"></label><p id="file-name" class="small muted" data-i18n="file_help">{{ t('file_help') }}</p>
+<p class="small studio-link"><a href="/tools/domain_names">{{ icon('sparkles') }}<span data-i18n="open_name_studio">{{ t('open_name_studio') }}</span></a></p>
 <details class="generator"><summary data-i18n="generator">{{ t('generator') }}</summary><label><span data-i18n="bases">{{ t('bases') }}</span><input id="base-names" dir="ltr" placeholder="netnama, mybrand"></label><label><span data-i18n="suffixes">{{ t('suffixes') }}</span><input id="suffixes" dir="ltr" placeholder="com, ir, co.uk"></label><div class="button-row"><button type="button" id="preview-generate" class="button secondary" data-i18n="preview">{{ t('preview') }}</button><button type="button" id="add-generate" class="button secondary" data-i18n="add">{{ t('add') }}</button></div><pre id="generator-preview" dir="ltr" hidden></pre></details>
 <details class="generator"><summary data-i18n="domain_helpers">{{ t('domain_helpers') }}</summary><label><span data-i18n="target">{{ t('target') }}</span><input id="normalize-input" dir="ltr" placeholder="مثال.com" maxlength="1024"></label><button type="button" class="button secondary" id="normalize-button" data-i18n="normalize">{{ t('normalize') }}</button><pre id="normalize-output" dir="ltr" hidden></pre><label><span data-i18n="suffix_list">{{ t('suffix_list') }}</span><select id="suffix-list" dir="ltr"><option value="">—</option></select></label></details>
 <label class="check-label"><input id="force-fresh" type="checkbox"><span data-i18n="force_fresh">{{ t('force_fresh') }}</span></label>
@@ -44,6 +45,54 @@
 <div id="empty-state"><div class="empty-icon">{{ icon('terminal') }}</div><h3 data-i18n="no_job">{{ t('no_job') }}</h3><p class="muted" data-i18n="empty_hint">{{ t('empty_hint') }}</p></div>
 <div id="results-container" hidden><div class="table-scroll"><table><thead><tr><th data-i18n="target">{{ t('target') }}</th><th data-i18n="status">{{ t('status') }}</th><th data-i18n="reason">{{ t('reason') }}</th></tr></thead><tbody id="result-rows"></tbody></table></div></div>
 <div class="terminal-header"><span>{{ icon('terminal') }}<span data-i18n="terminal">{{ t('terminal') }}</span></span><div class="terminal-actions"><button id="copy-terminal" class="icon-button" data-aria="copy" aria-label="{{ t('copy') }}">{{ icon('copy') }}</button><button id="wrap-terminal" class="icon-button" data-aria="wrap" aria-label="{{ t('wrap') }}" aria-pressed="false">{{ icon('wrap-text') }}</button><button id="clear-terminal" class="icon-button" data-aria="clear" aria-label="{{ t('clear') }}" data-title="clear_help" title="{{ t('clear_help') }}">{{ icon('eraser') }}</button></div></div><pre id="terminal" dir="ltr" tabindex="0"></pre><p id="truncation" class="small warning-text" hidden data-i18n="truncated">{{ t('truncated') }}</p></section></div>
+{% elif page == 'domain_names' %}
+<section class="panel name-studio" id="name-studio">
+  <div class="stepper" role="tablist" aria-label="{{ t('domain_names') }}">
+    {% for number, key in [(1,'studio_step_words'),(2,'studio_step_names'),(3,'studio_step_latin'),(4,'studio_step_address')] %}
+    <button type="button" class="step" data-step="{{ number }}"><small dir="ltr">{{ number }}</small><span data-i18n="{{ key }}">{{ t(key) }}</span></button>
+    {% endfor %}
+  </div>
+  <div id="token-summary" class="summary-row"></div>
+  <div id="studio-1">
+    <p class="muted" data-i18n="studio_words_help">{{ t('studio_words_help') }}</p>
+    <div class="studio-add"><label><span data-i18n="studio_add_word">{{ t('studio_add_word') }}</span><input id="word-input" maxlength="40" autocomplete="off" placeholder="{{ t('studio_word_placeholder') }}"></label><button type="button" id="word-add" class="button secondary">{{ icon('plus') }}<span data-i18n="studio_add_word">{{ t('studio_add_word') }}</span></button></div>
+    <p class="small muted" data-i18n="studio_places">{{ t('studio_places') }}</p>
+    <div id="place-suggestions" class="summary-row"></div>
+    <p class="small" data-i18n="studio_your_words">{{ t('studio_your_words') }}</p>
+    <div id="word-list" class="token-stack"></div>
+  </div>
+  <div id="studio-2" hidden>
+    <p class="muted" data-i18n="studio_names_help">{{ t('studio_names_help') }}</p>
+    <label><span data-i18n="studio_name_search">{{ t('studio_name_search') }}</span><input id="name-query" maxlength="40" autocomplete="off" placeholder="{{ t('studio_name_placeholder') }}"></label>
+    <div class="button-row" id="gender-filters" role="group" aria-label="{{ t('studio_gender_all') }}">
+      {% for value, key in [('','studio_gender_all'),('f','studio_gender_f'),('m','studio_gender_m'),('b','studio_gender_b')] %}
+      <button type="button" class="button secondary" data-gender="{{ value }}" data-i18n="{{ key }}">{{ t(key) }}</button>
+      {% endfor %}
+    </div>
+    <p class="small muted"><span data-i18n="studio_names_source">{{ t('studio_names_source') }}</span> · <span id="name-count" dir="ltr"></span></p>
+    <div id="name-results" class="name-results"></div>
+    <p id="name-empty" class="small muted" hidden data-i18n="studio_no_names">{{ t('studio_no_names') }}</p>
+    <button type="button" id="add-custom-name" class="button secondary" hidden data-i18n="studio_add_custom_name">{{ t('studio_add_custom_name') }}</button>
+    <p class="small" data-i18n="studio_selected_names">{{ t('studio_selected_names') }}</p>
+    <div id="name-selected" class="token-stack"></div>
+  </div>
+  <div id="studio-3" hidden>
+    <p class="muted" data-i18n="studio_latin_help">{{ t('studio_latin_help') }}</p>
+    <div id="token-list" class="token-stack"></div>
+    <label class="check-label"><input id="style-joined" type="checkbox" checked><span data-i18n="studio_joined">{{ t('studio_joined') }}</span></label>
+    <label class="check-label"><input id="style-hyphen" type="checkbox" checked><span data-i18n="studio_hyphen">{{ t('studio_hyphen') }}</span></label>
+  </div>
+  <div id="studio-4" hidden>
+    <p class="muted" data-i18n="studio_tld_help">{{ t('studio_tld_help') }}</p>
+    <div id="tld-list" class="tld-grid"></div>
+    <div class="studio-add"><label><span data-i18n="studio_custom_tld">{{ t('studio_custom_tld') }}</span><input id="tld-input" dir="ltr" maxlength="24" autocomplete="off" placeholder="co.ir" spellcheck="false"></label><button type="button" id="tld-add" class="button secondary" data-i18n="studio_add_tld">{{ t('studio_add_tld') }}</button></div>
+    <div class="button-row"><button type="button" id="build-domains" class="button primary">{{ icon('sparkles') }}<span data-i18n="studio_build">{{ t('studio_build') }}</span></button><button type="button" id="select-domains" class="button secondary" data-i18n="studio_select_all">{{ t('studio_select_all') }}</button><button type="button" id="copy-domains" class="button secondary">{{ icon('copy') }}<span data-i18n="studio_copy_domains">{{ t('studio_copy_domains') }}</span></button><button type="button" id="use-domains" class="button secondary">{{ icon('globe') }}<span data-i18n="studio_add_checker">{{ t('studio_add_checker') }}</span></button></div>
+    <p class="small muted" data-i18n="studio_domain_hint">{{ t('studio_domain_hint') }}</p>
+    <div id="domain-list"></div>
+    <p id="domain-empty" class="muted" data-i18n="studio_empty_domains">{{ t('studio_empty_domains') }}</p>
+  </div>
+  <div class="button-row studio-nav"><button type="button" id="studio-back" class="button secondary" hidden data-i18n="studio_back">{{ t('studio_back') }}</button><button type="button" id="studio-next" class="button primary" data-i18n="studio_next">{{ t('studio_next') }}</button></div>
+</section>
 {% elif page == 'resources' %}
 <section class="panel"><div class="panel-heading"><h2 data-i18n="resources">{{ t('resources') }}</h2><button class="button secondary" id="refresh-resources">{{ icon('refresh-cw') }}<span data-i18n="refresh">{{ t('refresh') }}</span></button></div><div id="resources-list" class="resource-grid"></div></section>
 <section class="panel password-panel"><div class="panel-heading"><h2 data-i18n="change_password">{{ t('change_password') }}</h2>{{ icon('lock-keyhole') }}</div><form id="password-form"><label><span data-i18n="current_password">{{ t('current_password') }}</span><input type="password" name="current_password" autocomplete="current-password" required></label><label><span data-i18n="new_password">{{ t('new_password') }}</span><input type="password" name="new_password" autocomplete="new-password" minlength="12" maxlength="256" required></label><button class="button primary" type="submit" data-i18n="save">{{ t('save') }}</button></form></section>

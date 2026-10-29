@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from netnama.auth.routes import authenticated
 
 bp = Blueprint("web", __name__)
-PAGES = {"overview", "domain_batch", "dns", "ping", "ip", "http", "resources", "about"}
+PAGES = {"overview", "domain_batch", "domain_names", "dns", "ping", "ip", "http", "resources", "about"}
 
 
 @bp.get("/")

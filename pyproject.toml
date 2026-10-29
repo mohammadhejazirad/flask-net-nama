@@ -24,7 +24,7 @@ include = ["netnama*"]
 version = {attr = "netnama._version.__version__"}
 
 [tool.setuptools.package-data]
-netnama = ["templates/*.html", "static/**/*", "static/*.svg", "locales/*.json", "resources/bundled/*"]
+netnama = ["templates/*.html", "static/**/*", "static/*.svg", "locales/*.json", "resources/bundled/*", "resources/persian_names.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

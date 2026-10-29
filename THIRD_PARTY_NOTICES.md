@@ -34,5 +34,10 @@ full installed distribution notices are retained by Python package installers.
 `pip-audit` may bring requests as a development dependency; requests is not a
 runtime dependency and is not used for application network operations.
 
+persian-names, version 2.0.0: MIT, copyright MohammadReza HejaziRad.
+The given-name list used by the domain-name studio is stored as
+`netnama/resources/persian_names.json`.
+https://github.com/mohammadhejazirad/persian-names — `docs/licenses/persian-names-MIT.txt`
+
 The supplied NetNama vector marks are used as project assets. Availability of
 the brand name, repository name or trademark has not been verified.
