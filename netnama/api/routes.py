@@ -1,3 +1,4 @@
+from netnama._version import __version__
 import ipaddress
 import json
 import platform
@@ -22,7 +23,7 @@ bp = Blueprint("api", __name__, url_prefix="/api")
 def capabilities():
     settings = current_app.extensions["settings"]
     return jsonify(
-        version="0.1.0",
+        version=__version__,
         platform=platform.system(),
         execution_origin="server",
         ping=bool(shutil.which("ping")),

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netnama"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Bilingual, privacy-conscious domain and network toolbox"
 requires-python = ">=3.12"
 license = "MIT"
@@ -19,6 +19,9 @@ netnama = "netnama.__main__:main"
 
 [tool.setuptools.packages.find]
 include = ["netnama*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "netnama._version.__version__"}
 
 [tool.setuptools.package-data]
 netnama = ["templates/*.html", "static/**/*", "static/*.svg", "locales/*.json", "resources/bundled/*"]

@@ -7,6 +7,7 @@ from flask import Flask, g, jsonify, request
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 
+from netnama._version import __version__
 from netnama.config import Settings
 from netnama.core.jobs import CapacityError, JobStore
 from netnama.core.scheduler import Scheduler
@@ -76,6 +77,7 @@ def create_app(test_config=None):
             "catalogs": app.extensions["catalogs"],
             "locale": g.locale,
             "dir": "rtl" if g.locale == "fa" else "ltr",
+            "app_version": __version__,
         }
 
     @app.after_request

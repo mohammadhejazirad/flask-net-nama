@@ -9,6 +9,14 @@ live bounded output, and explicit TXT / JSON / JSON.TXT downloads.
 
 ## Run locally
 
+Current release: **v1.0.0**. Versions follow `MAJOR.MINOR.PATCH` (breaking changes,
+compatible features, fixes). The canonical version is in
+[`netnama/_version.py`](netnama/_version.py); Python package metadata, UI, API and
+exports read it directly. For a release, update that value, synchronize frontend
+metadata with `npm version X.Y.Z --no-git-tag-version`, run `uv lock` and
+`npm run build`, and update [CHANGELOG.md](CHANGELOG.md). After verification and
+commit, releases can be tagged `vX.Y.Z`.
+
 Python **3.12+** is required. Node is needed only when rebuilding frontend assets.
 Compiled CSS/JS, local licensed fonts and current official datasets are included.
 

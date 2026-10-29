@@ -1,3 +1,4 @@
+from netnama._version import __version__
 import copy
 import json
 import re
@@ -100,7 +101,7 @@ class Job:
             return copy.deepcopy(
                 {
                     "schema_version": "1.0",
-                    "app": {"name": "NetNama", "version": "0.1.0"},
+                    "app": {"name": "NetNama", "version": __version__},
                     "tool": self.tool,
                     "job_id": self.id,
                     "started_at": self.started_at,
