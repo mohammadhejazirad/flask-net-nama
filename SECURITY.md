@@ -1,8 +1,10 @@
 # Security
 
-Local deployment binds loopback; initial credentials are `admin / 123456`.
-Use the settings page to change the password. Public mode rejects the default
-password, weak/missing environment secret and private-target allowance.
+Native local deployment binds loopback. Docker quick start publishes port 8080
+on all host interfaces and uses initial credentials `admin / 123456`; change the
+password in the settings page. Docker starts without a .env file or HTTPS setup.
+A random secret is generated and persisted automatically. Public mode rejects
+explicit weak secrets and private-target allowance.
 Terminate HTTPS at a trusted proxy and set `NETNAMA_HTTPS=true`. No proxy headers
 are trusted by default. Do not expose the application through a public demo login.
 

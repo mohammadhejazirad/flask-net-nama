@@ -106,7 +106,10 @@ def test_names_api(client, login, app):
     assert inspected.json["latin"] == "kashan"
     composed = client.post(
         "/api/names/compose",
-        json={"tokens": [{"fa": "نگین", "role": "name"}, {"fa": "فرش", "role": "keyword"}], "tlds": ["ir", "com"]},
+        json={
+            "tokens": [{"fa": "نگین", "role": "name"}, {"fa": "فرش", "role": "keyword"}],
+            "tlds": ["ir", "com"],
+        },
         headers=login,
     )
     assert composed.status_code == 200

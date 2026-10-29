@@ -105,7 +105,7 @@ export NETNAMA_HTTPS=true
 python -m netnama
 ```
 
-حالت عمومی با رمز پیشفرض، secret ضعیف یا مجوز مقصد خصوصی شروع نمی‌شود. پشت
+secret در صورت تنظیم‌نشدن خودکار ساخته و ذخیره می‌شود؛ secret ضعیفِ صریح و مجوز مقصد خصوصی در حالت عمومی پذیرفته نمی‌شود. پشت
 reverse proxy دارای HTTPS قرار دهید؛ `NETNAMA_HTTPS=true` را برای کوکی Secure
 فعال کنید. پیشفرض هیچ forwarded header مورد اعتماد نیست. اگر ProxyFix اضافه
 می‌کنید تعداد hop دقیق و مسیر دسترسی مستقیم به بک‌اند را کنترل کنید. برای SSE
@@ -118,13 +118,23 @@ link-local، multicast و IPv4-mapped IPv6 در حالت عمومی مسدود �
 بررسی می‌شود. فقط برای آزمایش محلی مقصد خصوصی می‌توان
 `NETNAMA_ALLOW_PRIVATE_TARGETS=true` گذاشت؛ هشدار در پنل نمایش داده می‌شود.
 
-Docker: پس از تنظیم `NETNAMA_PASSWORD` و `NETNAMA_SECRET_KEY`، دستور
-`docker compose up --build` را اجرا کنید. پورت میزبان فقط روی loopback منتشر
-می‌شود. container با کاربر non-root، filesystem فقط‌خواندنی، volume قابل نوشتن
-برای داده و بدون capability اجرا می‌شود. image حداقلی ping ندارد و این قابلیت
-را unavailable نشان می‌دهد؛ در صورت نیاز، در image مشتق‌شدهٔ بررسی‌شده binary
-و حداقل مجوز لازم را اضافه کنید. privileged ممنوع است. نتایج از شبکهٔ container
-هستند. وضعیت تأیید واقعی Docker در گزارش آزمون ثبت شده است.
+اجرای سریع با Docker Compose نسخهٔ 2.24 یا جدیدتر:
+
+```sh
+docker compose up -d --build
+```
+
+نشانی: **http://SERVER_IP:8080** یا **http://localhost:8080**؛ ورود اولیه:
+**admin / 123456**. نیازی به ساخت `.env`، تولید secret یا راه‌اندازی HTTPS برای
+شروع نیست. Compose فایل `.env.example` موجود را می‌خواند؛ تغییر تنظیمات با ویرایش
+همان فایل یا ساخت `.env` اختیاری است. secret خودکار ساخته و روی volume ذخیره
+می‌شود. رمز را از داخل برنامه تغییر دهید؛ در volume قدیمی رمز قبلی معتبر است.
+
+راهنمای تنظیمات اختیاری، HTTPS، پشتیبان‌گیری و ارتقا در
+[راهنمای Docker سرور](docs/DOCKER.fa.md) است. ایمیج فرانت‌اند را هنگام build
+می‌سازد، با کاربر non-root و فایل‌سیستم فقط‌خواندنی اجرا می‌شود و تنظیمات را
+روی volume نگه می‌دارد. ایمیج حداقلی ping ندارد.
+آزمون شروع بدون `.env`: `python3 scripts/docker_smoke.py --defaults`.
 
 ## منابع و توسعه
 

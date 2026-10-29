@@ -118,8 +118,8 @@ export NETNAMA_HTTPS=true
 python -m netnama
 ```
 
-Public mode refuses default credentials, weak/missing explicit secrets and
-private-target allowance. Private, loopback, metadata, link-local, multicast
+Public mode generates and persists a random secret automatically when none is supplied.
+Explicit weak secrets and private-target allowance are rejected. Private, loopback, metadata, link-local, multicast
 and IPv4-mapped IPv6 targets are blocked. Every resolved address is checked;
 HTTP/TLS use checked numeric connections and original Host/SNI. Each redirect
 is validated again. Local testing of private hosts needs
@@ -131,13 +131,24 @@ an exact known hop count and prevent direct access to the backend. Keep access
 logs disabled or remove target/query/token data. GitHub Pages/static hosting
 cannot run this backend. Do not expose a shared default-credential demo.
 
-Docker: export a unique `NETNAMA_PASSWORD` and random `NETNAMA_SECRET_KEY`, then
-`docker compose up --build`. The host port is loopback-only. Container internal
-binding requires public mode. The image is non-root, read-only with a writable
-data volume, and drops all capabilities. Ping is **unavailable** in the minimal
-image; install a system ping binary and grant only necessary capabilities in a
-reviewed derived image if needed. Do not use privileged mode. Docker execution
-has not been verified unless noted in the verification report.
+Docker quick start (Compose 2.24+):
+
+```sh
+docker compose up -d --build
+```
+
+Open `http://SERVER_IP:8080` (or `http://localhost:8080`); first login is
+`admin / 123456`, which you can change in app settings. No `.env`, generated
+password, manual secret or reverse proxy is required to start. Compose reads the
+included `.env.example`; an optional `.env` overrides application settings.
+The random secret is created automatically and preserved on the data volume.
+For an existing volume, its saved password still applies.
+
+The image builds frontend assets from the npm lockfile and runs non-root with a
+read-only rootfs and persistent data volume. Ping is unavailable in this minimal
+image. HTTPS and custom host binding/port remain optional. See the
+[deployment guide (Persian)](docs/DOCKER.fa.md). Reproduce the no-`.env` test with
+`python3 scripts/docker_smoke.py --defaults`.
 
 ## Reference updates and development
 

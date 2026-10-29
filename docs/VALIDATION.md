@@ -1,8 +1,73 @@
-# NetNama 0.1.0 verification
+# NetNama verification
 
 Date: 2026-10-29. Reference: `.docs/NETNAMA_AGENT_SPEC_FA.md`.
 This report distinguishes real observations, mocked protocol tests and unverified
 platforms. It does not certify registry service permission or a production SLA.
+
+## Simplified Docker defaults — v1.0.0
+
+The current Compose service reads the supplied `.env.example` directly and an
+optional `.env` override (Compose 2.24+). It starts over HTTP on host port 8080
+without manually supplied credentials or a secret. Initial login is
+`admin / 123456`; an empty secret setting generates a random persistent secret.
+The default host binding is now all interfaces; HTTPS and loopback-only binding
+are optional. Explicit weak secrets and private-target access remain rejected
+in public mode. The earlier mandatory-configuration behavior described in the
+previous recheck below is historical.
+
+Using the rebuilt verification image with the same offline Python wheel method
+described below, `python3 scripts/docker_smoke.py --defaults --image
+netnama:deployment-check --skip-build` passed in an isolated directory containing
+the actual Compose file and `.env.example`, with **no `.env` file**. Only a random
+test host port/loopback binding and the image/build-context overrides were used.
+Default login, generated-secret persistence across restart, names, jobs, SSE,
+exports, secure-cookie opt-in, backup/restore and graceful shutdown passed.
+The companion run without `--defaults` also passed, using an optional `.env`
+with custom credentials/secret to verify override precedence over `.env.example`.
+The application suite passed **105 tests in 8.34 seconds**; Ruff checks passed.
+Ordinary online builds still require working access to the package registries.
+
+## Earlier Docker deployment recheck — v1.0.0
+
+Rechecked on 2026-10-29 with Docker Engine 29.9.2, Compose 5.6.1,
+Linux amd64 and the pinned Python 3.13 / Node 24 base images.
+
+- The production Dockerfile now builds the frontend using `npm ci` and a separate
+  Node stage. That stage completed successfully using the actual online npm registry.
+- Ordinary online Python dependency installation was attempted and failed because
+  this environment cannot resolve `files.pythonhosted.org` (also confirmed from
+  the host). This remains an environment prerequisite for a normal online build.
+- A separate temporary build context added local wheels and pip offline-source
+  settings to the Dockerfile. Runtime requirements were still checked against the
+  unchanged `requirements.lock` hashes; application code and the frontend build
+  were unchanged. This produced `netnama:deployment-check` with version 1.0.0.
+  It is a verification image, not a claim that the ordinary online build succeeded.
+- `python3 scripts/docker_smoke.py --image netnama:deployment-check --skip-build`
+  passed against the repository's actual Compose service, with only an image-tag
+  override and randomly generated test credentials/loopback port. It verified
+  healthy startup, UID/GID 10001, read-only rootfs, dropped capabilities,
+  no-new-privileges, init, 512 MiB memory cap and loopback-only port publication.
+- Real HTTP checks passed for authentication/CSRF, local fonts/logo/compiled assets,
+  bundled reference availability, public-mode guards, Persian name composition,
+  local CIDR job completion, SSE result/done events and JSON attachment export.
+- Restart preserved the settings file hash and login credentials. SIGTERM exited
+  with code 0 and no OOM. The documented tar backup/restore commands passed on
+  the disposable test volume, followed by successful startup and login.
+- `NETNAMA_HTTPS=true` produced Secure cookies and the expected HSTS header in a
+  separate container invocation. The Nginx example passed `nginx -t` in a temporary
+  `nginx:alpine` container with a disposable test certificate. No real-domain TLS
+  certificate issuance or remote-server deployment is claimed.
+- The minimal image still intentionally has no ping executable. The smoke test
+  does not query external registries; server DNS/HTTPS/TCP-43 egress and registry
+  rate limits must be available for live domain lookups.
+- Temporary test containers, networks and volumes were removed. Existing services
+  and application volumes were not modified. The verification image was retained.
+- Current application suite: **104 passed in 8.17 seconds**. Ruff lint and format
+  checks passed for `netnama`, `tests` and `scripts`. A Docker smoke job is now
+  included in CI; its remote execution has not been observed here.
+
+The remaining sections record the original v0.1.0 baseline; their browser/network
+measurements are historical and do not replace testing the current UI on a server.
 
 ## Automated application checks
 

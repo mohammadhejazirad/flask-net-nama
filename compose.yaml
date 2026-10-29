@@ -1,14 +1,17 @@
 services:
   netnama:
     build: .
+    init: true
+    env_file:
+      - path: .env.example
+      - path: .env
+        required: false
     ports:
-      - "127.0.0.1:8080:8080"
+      - "${NETNAMA_BIND_ADDRESS:-0.0.0.0}:${NETNAMA_HTTP_PORT:-8080}:8080"
     environment:
       NETNAMA_MODE: public
       NETNAMA_HOST: 0.0.0.0
-      NETNAMA_PASSWORD: ${NETNAMA_PASSWORD:?Set a unique non-default password for first bootstrap}
-      NETNAMA_SECRET_KEY: ${NETNAMA_SECRET_KEY:?Set a random secret with 32 or more characters}
-      NETNAMA_HTTPS: ${NETNAMA_HTTPS:-false}
+      NETNAMA_PORT: "8080"
     volumes:
       - netnama-data:/data
     cap_drop: [ALL]
@@ -18,5 +21,13 @@ services:
     tmpfs:
       - /tmp:size=32m
     restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: ${NETNAMA_MEMORY_LIMIT:-512m}
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 volumes:
   netnama-data:

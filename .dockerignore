@@ -5,5 +5,17 @@ node_modules
 .pytest_cache
 .ruff_cache
 .env
+.env.*
+.aws
+.agents
+.codex
+.vscode
+.github
+.docs
+assets
+build
+dist
+*.egg-info
+*.log
 __pycache__
 tests

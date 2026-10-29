@@ -14,11 +14,13 @@ from netnama.resources.manager import validate
 
 def test_public_guard(tmp_path, monkeypatch):
     monkeypatch.setenv("NETNAMA_MODE", "public")
+    settings = Settings(tmp_path)
+    assert len(settings.secret) >= 32
+    assert Settings(tmp_path).secret == settings.secret
+    monkeypatch.setenv("NETNAMA_SECRET_KEY", "weak")
     with pytest.raises(ValueError):
         Settings(tmp_path)
     monkeypatch.setenv("NETNAMA_SECRET_KEY", "strong-random-example-0123456789abcdef")
-    with pytest.raises(ValueError):
-        Settings(tmp_path)
     monkeypatch.setenv("NETNAMA_PASSWORD", "real-new-password-123")
     settings = Settings(tmp_path)
     assert "real-new-password-123" not in settings.path.read_text(encoding="utf-8")
@@ -114,3 +116,17 @@ def test_updater_304(app, monkeypatch):
     monkeypatch.setattr(manager, "request", unchanged)
     result = app.extensions["scheduler"].update(app.extensions["resources"], "dns").result(3)
     assert result["status"] == "not_modified"
+
+
+def test_public_defaults_generate_persistent_secret_and_allow_initial_login(tmp_path, monkeypatch):
+    from werkzeug.security import check_password_hash
+
+    monkeypatch.setenv("NETNAMA_MODE", "public")
+    monkeypatch.setenv("NETNAMA_SECRET_KEY", "")
+    monkeypatch.setenv("NETNAMA_PASSWORD", "123456")
+    settings = Settings(tmp_path)
+    assert settings.public and not settings.allow_private
+    assert check_password_hash(settings.values["password_hash"], "123456")
+    assert len(settings.secret) == 64
+    assert Settings(tmp_path).secret == settings.secret
+    assert Settings(tmp_path / "other").secret != settings.secret

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from filelock import FileLock
 from platformdirs import user_data_dir
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import generate_password_hash
 
 
 def atomic_json(path, value):
@@ -49,7 +49,7 @@ class Settings:
                     "secret": os.getenv("NETNAMA_SECRET_KEY") or secrets.token_hex(32),
                     "auth_version": 1,
                 }
-                # Validate before writing an insecure public bootstrap.
+                # Validate explicit options before persisting the first configuration.
                 self.validate()
                 atomic_json(self.path, self.values)
         self.validate()
@@ -63,11 +63,9 @@ class Settings:
 
     def validate(self):
         if self.public:
-            secret = os.getenv("NETNAMA_SECRET_KEY", "")
+            secret = os.getenv("NETNAMA_SECRET_KEY") or self.values["secret"]
             if len(secret) < 32 or len(set(secret)) < 12:
-                raise ValueError("Public mode requires a strong NETNAMA_SECRET_KEY (32+ characters).")
-            if check_password_hash(self.values["password_hash"], "123456"):
-                raise ValueError("Change the default password before enabling public mode.")
+                raise ValueError("NETNAMA_SECRET_KEY must have 32+ characters and sufficient variety.")
             if self.allow_private:
                 raise ValueError("NETNAMA_ALLOW_PRIVATE_TARGETS is forbidden in public mode.")
 
