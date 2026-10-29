@@ -155,6 +155,10 @@ uv run python scripts/live_smoke.py
 ```
 
 The frontend imports only selected Lucide icons. Release assets require no Node.
+After updating code or rebuilding assets, stop and restart the running NetNama
+process, then reload the browser. Waitress does not reload Python code, cached
+templates or translation catalogs; leaving it running can mix old HTML with new
+CSS/JavaScript and break the interface. Restart clears in-memory jobs and sessions.
 For official data refresh during release, run `python scripts/bundle_resources.py`
 and verify datasets, licenses and manifest before shipping.
 
