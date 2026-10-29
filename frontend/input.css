@@ -51,7 +51,11 @@ body:has(.confirm-dialog[open]){overflow:hidden}
 .token-row.compact{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto}
 .token-row input,.token-row select{min-height:38px;margin:0}
 .token-actions{display:flex;gap:2px}
-.name-results{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
+.name-results{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;max-height:460px;margin:4px 0 12px;overflow:auto;padding:2px}
+.name-pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
+.name-pager .button{min-height:36px}
+.page-jump{flex-direction:row;align-items:center;gap:8px;margin:0;white-space:nowrap}
+.page-jump input{width:78px;min-height:36px}
 .name-hit{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:108px;min-height:54px;padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
 .name-hit[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .name-hit bdi{font:12px/1.4 JetBrains,monospace;color:var(--muted)}

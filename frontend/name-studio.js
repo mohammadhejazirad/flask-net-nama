@@ -8,7 +8,7 @@ const ROLES = ['name', 'keyword', 'place', 'custom'];
 export function mountNameStudio({t, api, toast}) {
   if (document.body.dataset.page !== 'domain_names') return () => {};
   const $ = (id) => document.getElementById(id);
-  const state = {step: 1, tokens: [], gender: '', tlds: ['ir', 'com'], joined: true, hyphen: true, domains: [], results: [], total: 0, count: 0};
+  const state = {step: 1, tokens: [], gender: '', tlds: ['ir', 'com'], joined: true, hyphen: true, domains: [], results: [], total: 0, count: 0, namePage: 1, pages: 1, pageSize: 48};
   let nextId = 1;
   let builtFrom = '';
   let searchTimer;
@@ -157,7 +157,14 @@ export function mountNameStudio({t, api, toast}) {
     const box = $('name-results');
     box.replaceChildren();
     const query = $('name-query').value.trim();
-    $('name-count').textContent = state.count ? String(state.count) : '';
+    const from = state.total ? (state.namePage - 1) * state.pageSize + 1 : 0;
+    const to = Math.min(state.namePage * state.pageSize, state.total);
+    $('name-count').textContent = state.total ? `${from}–${to} / ${state.total}` : '0';
+    $('name-pages').textContent = `/ ${state.pages || 1}`;
+    $('name-page-input').max = String(state.pages || 1);
+    if (document.activeElement !== $('name-page-input')) $('name-page-input').value = String(state.namePage || 1);
+    $('names-prev').disabled = state.namePage <= 1;
+    $('names-next').disabled = state.namePage >= (state.pages || 1);
     for (const item of state.results) {
       const selected = state.tokens.some(token => token.role === 'name' && token.fa === item.name);
       const button = document.createElement('button');
@@ -278,13 +285,16 @@ export function mountNameStudio({t, api, toast}) {
     renderSteps();
     renderIcons();
   }
-  async function searchNames() {
+  async function searchNames(page = 1) {
     const query = $('name-query').value.trim();
     try {
-      const data = await api(`/api/names?q=${encodeURIComponent(query)}&gender=${state.gender}&limit=24`);
+      const data = await api(`/api/names?q=${encodeURIComponent(query)}&gender=${state.gender}&limit=48&page=${page}`);
       state.results = data.items;
       state.total = data.total;
       state.count = data.count;
+      state.namePage = data.page;
+      state.pages = data.pages;
+      state.pageSize = data.page_size;
       renderResults();
     } catch (error) {toast(error.message);}
   }
@@ -340,12 +350,19 @@ export function mountNameStudio({t, api, toast}) {
     button.addEventListener('click', () => addText(place, 'place'));
     $('place-suggestions').append(button);
   }
-  $('name-query').addEventListener('input', () => {clearTimeout(searchTimer); searchTimer = setTimeout(searchNames, 200);});
+  $('name-query').addEventListener('input', () => {clearTimeout(searchTimer); searchTimer = setTimeout(() => searchNames(1), 200);});
   $('name-query').addEventListener('keydown', event => {if (event.key === 'Enter') {event.preventDefault(); $('add-custom-name').hidden ? null : $('add-custom-name').click();}});
   for (const button of document.querySelectorAll('#gender-filters button')) {
-    button.addEventListener('click', () => {state.gender = button.dataset.gender; persist(); renderSteps(); searchNames();});
+    button.addEventListener('click', () => {state.gender = button.dataset.gender; persist(); renderSteps(); searchNames(1);});
   }
   $('add-custom-name').addEventListener('click', () => addText($('name-query').value, 'name'));
+  $('names-prev').addEventListener('click', () => {if (state.namePage > 1) searchNames(state.namePage - 1);});
+  $('names-next').addEventListener('click', () => {if (state.namePage < state.pages) searchNames(state.namePage + 1);});
+  $('name-page-input').addEventListener('change', () => {
+    const page = Number($('name-page-input').value);
+    if (!Number.isInteger(page) || page < 1) {$('name-page-input').value = String(state.namePage); return;}
+    searchNames(page);
+  });
   $('style-joined').addEventListener('change', () => {state.joined = $('style-joined').checked; builtFrom = ''; persist();});
   $('style-hyphen').addEventListener('change', () => {state.hyphen = $('style-hyphen').checked; builtFrom = ''; persist();});
   $('tld-add').addEventListener('click', () => {

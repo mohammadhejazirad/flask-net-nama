@@ -16,56 +16,6 @@ _DATA = Path(__file__).resolve().parents[1] / "resources" / "persian_names.json"
 _LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$")
 _TLD = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,22}[a-z0-9])?(?:\.[a-z]{2,12})?$")
 _ROLES = {"name", "keyword", "place", "custom"}
-_POPULAR = (
-    "نگین",
-    "آرمین",
-    "رها",
-    "نیلوفر",
-    "پارسا",
-    "کیان",
-    "سارا",
-    "آوا",
-    "ماهان",
-    "یسنا",
-    "آرمان",
-    "شایان",
-    "ملیکا",
-    "پریسا",
-    "نازنین",
-    "هستی",
-    "درسا",
-    "یکتا",
-    "بردیا",
-    "سامان",
-    "سهیل",
-    "نرگس",
-    "یاسمین",
-    "گلناز",
-    "شیرین",
-    "مریم",
-    "زهرا",
-    "علی",
-    "رضا",
-    "امیر",
-    "نیما",
-    "سینا",
-    "باران",
-    "ستاره",
-    "کیمیا",
-    "هلیا",
-    "رادین",
-    "پویا",
-    "کاوه",
-    "آرش",
-    "غزل",
-    "نگار",
-    "یلدا",
-    "مهسا",
-    "دریا",
-    "مانی",
-    "بهار",
-    "شبنم",
-)
 
 MAX_TOKENS = 8
 MAX_LABELS = 48
@@ -93,43 +43,48 @@ def _record(name, gender):
     return {"name": name, "gender": gender, "latin": transliterate(name), "key": key}
 
 
-def search(query="", gender="", limit=24):
+def _matched_names(query, gender):
     data = catalog()
-    try:
-        limit = int(limit)
-    except (TypeError, ValueError):
-        raise ValidationError("invalid_input") from None
-    limit = min(max(limit, 1), 30)
     allowed = {gender} if gender in {"m", "f", "b"} else set()
     needle = normalize_fa(query).replace(" ", "")
     if len(needle) > 40:
         raise ValidationError("invalid_input")
+    names = data["names"]
+    if allowed:
+        names = [item for item in names if item["gender"] in allowed]
     if not needle:
-        items = []
-        for name in _POPULAR:
-            known = data["index"].get(normalize_fa(name).replace(" ", ""))
-            if known is None:
-                continue
-            if allowed and known["gender"] not in allowed:
-                continue
-            items.append(_record(known["name"], known["gender"]))
-            if len(items) >= limit:
-                break
-        return {"items": items, "total": len(items), "source": data["source"], "count": data["count"]}
+        return sorted(names, key=lambda item: item["key"]), data
     starts, contains = [], []
-    for item in data["names"]:
-        if allowed and item["gender"] not in allowed:
-            continue
+    for item in names:
         if item["key"].startswith(needle):
             starts.append(item)
         elif needle in item["key"]:
             contains.append(item)
     starts.sort(key=lambda item: (len(item["key"]), item["key"]))
     contains.sort(key=lambda item: (len(item["key"]), item["key"]))
-    chosen = (starts + contains)[:limit]
+    return starts + contains, data
+
+
+def search(query="", gender="", limit=48, page=1):
+    try:
+        limit = int(limit)
+        page = int(page)
+    except (TypeError, ValueError):
+        raise ValidationError("invalid_input") from None
+    if limit < 1 or limit > 100 or page < 1 or page > 100000:
+        raise ValidationError("invalid_input")
+    matched, data = _matched_names(query, gender)
+    total = len(matched)
+    pages = max(1, (total + limit - 1) // limit)
+    page = min(page, pages)
+    start = (page - 1) * limit
+    chosen = matched[start : start + limit]
     return {
         "items": [_record(item["name"], item["gender"]) for item in chosen],
-        "total": len(starts) + len(contains),
+        "total": total,
+        "page": page,
+        "pages": pages,
+        "page_size": limit,
         "source": data["source"],
         "count": data["count"],
     }

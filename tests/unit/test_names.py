@@ -33,10 +33,23 @@ def test_catalog_covers_published_dataset():
 
 def test_search_prefers_prefix_and_reports_gender():
     result = search("نگ", limit=10)
-    assert result["items"][0]["name"] == "نگین" or result["items"][0]["name"].startswith("نگ")
+    assert result["items"][0]["name"].startswith("نگ")
     assert result["items"][0]["latin"]
     assert result["count"] > 10000
-    assert search("", limit=5)["items"]
+    assert result["total"] >= len(result["items"])
+
+
+def test_name_catalog_is_paged():
+    first = search("", limit=2, page=1)
+    second = search("", limit=2, page=2)
+    assert first["total"] == first["count"]
+    assert first["pages"] > 100
+    assert len(first["items"]) == 2
+    assert first["items"][0]["name"] != second["items"][0]["name"]
+    assert search("نگین", limit=10)["items"][0]["name"] == "نگین"
+    assert search("", limit=5, page=50000)["page"] == search("", limit=5)["pages"]
+    with pytest.raises(ValidationError):
+        search("", page=0)
 
 
 def test_classify_and_inspect():

@@ -291,7 +291,14 @@ def update_resources():
 def names_search():
     from netnama.core.names import search
 
-    return jsonify(search(request.args.get("q", ""), request.args.get("gender", ""), request.args.get("limit", 24)))
+    return jsonify(
+        search(
+            request.args.get("q", ""),
+            request.args.get("gender", ""),
+            request.args.get("limit", 48),
+            request.args.get("page", 1),
+        )
+    )
 
 
 @bp.post("/names/inspect")

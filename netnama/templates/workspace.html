@@ -71,6 +71,11 @@
     </div>
     <p class="small muted"><span data-i18n="studio_names_source">{{ t('studio_names_source') }}</span> · <span id="name-count" dir="ltr"></span></p>
     <div id="name-results" class="name-results"></div>
+    <div class="name-pager">
+      <button type="button" id="names-prev" class="button secondary" data-i18n="studio_prev_page">{{ t('studio_prev_page') }}</button>
+      <label class="page-jump"><span data-i18n="studio_page">{{ t('studio_page') }}</span><input id="name-page-input" type="number" min="1" value="1" dir="ltr" inputmode="numeric"><span id="name-pages" dir="ltr"></span></label>
+      <button type="button" id="names-next" class="button secondary" data-i18n="studio_next_page">{{ t('studio_next_page') }}</button>
+    </div>
     <p id="name-empty" class="small muted" hidden data-i18n="studio_no_names">{{ t('studio_no_names') }}</p>
     <button type="button" id="add-custom-name" class="button secondary" hidden data-i18n="studio_add_custom_name">{{ t('studio_add_custom_name') }}</button>
     <p class="small" data-i18n="studio_selected_names">{{ t('studio_selected_names') }}</p>
