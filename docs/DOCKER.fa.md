@@ -141,6 +141,20 @@ docker compose exec -T netnama python -c 'import urllib.request; print(urllib.re
 - خطای resolve هنگام build: DNS و دسترسی خروجی **Docker daemon/build** را بررسی
   کنید. کارکرد اینترنت میزبان الزاماً به معنی کارکرد اینترنت داخل Docker نیست.
   وابستگی‌ها یا بررسی TLS/hash را برای حل این مشکل غیرفعال نکنید.
+- خطاهای `ReadTimeout` یا `No matching distribution` پس از چند timeout ممکن است
+  از دسترسی ناقص به فهرست PyPI باشند. build به‌صورت پیشفرض timeout برابر 120
+  ثانیه، retry اتصال و سه تلاش کامل دارد. کش دانلود بین buildها حفظ می‌شود؛
+  اجرای دوبارهٔ `docker compose up -d --build` فایل‌های سالم کش‌شده را استفاده می‌کند.
+  اگر PyPI از شبکهٔ سرور قابل دسترسی نیست، می‌توانید یک mirror مورد اعتماد را
+  فقط برای build انتخاب کنید، بدون ساخت `.env`:
+
+  ```sh
+  docker compose build --build-arg PIP_INDEX_URL=https://YOUR_MIRROR/simple
+  docker compose up -d
+  ```
+
+  mirror باید همین نسخه‌های موجود در lockfile را داشته باشد؛ بررسی hash و TLS
+  همچنان فعال است. تغییر mirror ضروری نیست و پیشفرض همان PyPI رسمی است.
 - اگر سرور به registryها دسترسی ندارد، ایمیج را روی ماشین دارای دسترسی با معماری
   یکسان بسازید، با `docker save` منتقل و با `docker load` بارگذاری کنید. برای
   مثال ایمیج را `netnama:release` تگ بزنید و یک override با

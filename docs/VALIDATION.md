@@ -4,6 +4,25 @@ Date: 2026-10-29. Reference: `.docs/NETNAMA_AGENT_SPEC_FA.md`.
 This report distinguishes real observations, mocked protocol tests and unverified
 platforms. It does not certify registry service permission or a production SLA.
 
+## Docker download resilience
+
+Official PyPI release metadata confirmed that `httpx==0.28.1` exists, provides a
+universal Python wheel and supports Python >=3.8. Its locally available wheel
+matched the SHA-256 recorded in `requirements.lock`.
+
+The Dockerfile now uses a 120-second pip timeout, five transport retries, up to
+three complete installation attempts, and a persistent BuildKit pip cache for
+both dependency installation and application packaging. The default index remains
+official PyPI; an optional `PIP_INDEX_URL` build argument supports operator-chosen
+mirrors without disabling hashes or TLS verification.
+
+The ordinary online build was attempted again and still encountered this host's
+Docker DNS failure for `files.pythonhosted.org`; it was cancelled after confirming
+the recurring failure. A separate offline-source verification build using the
+updated Dockerfile completed successfully. Its `pip check` found no broken
+requirements and the Flask health endpoint returned 200 with httpx 0.28.1 installed.
+This verifies packaging and startup, not connectivity from a remote deployment.
+
 ## Simplified Docker defaults — v1.0.0
 
 The current Compose service reads the supplied `.env.example` directly and an
